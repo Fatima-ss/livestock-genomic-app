@@ -88,7 +88,7 @@ ui <- tagList(
 
 server <- function(input, output, session) {
 
-  onStop(function() { poolClose(db_pool) })
+  # (onStop line removed from here)
 
   # ---- Shared reactives used by more than one module -----------------------
   refresh_trigger <- reactiveVal(0)
@@ -199,4 +199,8 @@ server <- function(input, output, session) {
 # ------------------------------------------------------------------------------
 # 3. RUN APPLICATION
 # ------------------------------------------------------------------------------
+onStop(function() {
+  poolClose(db_pool)
+})
+
 shinyApp(ui = ui, server = server)
