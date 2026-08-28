@@ -1,0 +1,52 @@
+# ==============================================================================
+# MODULE: VALIDATION & FARM MANAGEMENT
+# Approve pending records; view a read-only audit table.
+# ==============================================================================
+
+mod_validation_ui <- function(id) {
+  ns <- NS(id)
+  uiOutput(ns("tab_validation_ui"))
+}
+
+# records_data: reactive df of animals
+# auth: shared reactiveValues
+# bump_refresh, log_activity: shared functions
+mod_validation_server <- function(id, records_data, auth, bump_refresh, log_activity) {
+  moduleServer(id, function(input, output, session) {
+    ns <- session$ns
+
+    output$tab_validation_ui <- renderUI({
+      req(auth$logged_in)
+      if (!auth$role %in% c("manager", "supervisor", "admin")) {
+        return(card(
+          class = "border-danger my-3 text-center p-4",
+          h4("Access Restricted", class = "text-danger fw-bold"),
+          p("Requires 'Farm Manager', 'Farm Supervisor', or 'System Admin' privileges.")
+        ))
+      }
+
+      card(
+        card_header("Record Audit & Approval Control Panel"),
+        p(class = "text-muted", "Review and approve submitted entries, and inspect farm metrics."),
+        actionButton(ns("approve_all_btn"), "Approve All Pending Records", class = "btn w-100 mb-3", style = "background:#17C3B2; color:#fff;"),
+        DTOutput(ns("table_validation"))
+      )
+    })
+
+    output$table_validation <- renderDT({
+      df <- records_data()
+      datatable(df[, setdiff(names(df), "animal_id")], rownames = FALSE,
+                options = list(pageLength = 6, scrollX = TRUE))
+    })
+
+    observeEvent(input$approve_all_btn, {
+      req(auth$logged_in, auth$role %in% c("manager", "supervisor", "admin"))
+      tryCatch({
+        dbExecute(db_pool, "UPDATE animals SET status = 'Approved', updated_at = CURRENT_TIME WHERE status = 'Pending Validation'")
+        bump_refresh()
+        log_activity(paste0(auth$full_name, " approved all pending records"))
+        showNotification("All pending records approved!", type = "default")
+      }, error = function(e) showNotification(paste("Could not approve records:", conditionMessage(e)), type = "error"))
+    })
+  })
+}

@@ -1,0 +1,5 @@
+PG_HOST=aws-0-ap-southeast-2.pooler.supabase.com
+PG_PORT=5432
+PG_DB=postgres
+PG_USER=postgres.lpexzsnnbaeedvguppuf
+PG_PASSWORD=noor@2503123

@@ -1,0 +1,13 @@
+# Secrets — NEVER commit these
+.Renviron
+!.Renviron.example
+
+# R session / history clutter
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+
+# OS files
+.DS_Store
+Thumbs.db

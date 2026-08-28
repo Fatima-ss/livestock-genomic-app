@@ -1,0 +1,10 @@
+name: livestock-genomic-app
+title:
+username: melow
+account: melow
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 17775651
+bundleId: 12474027
+url: https://melow.shinyapps.io/livestock-genomic-app/
+version: 1
